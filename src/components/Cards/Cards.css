@@ -1,0 +1,86 @@
+.cards-wrapper{
+    padding: 45px 50px
+}
+.heading{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+.planning p{
+    font-size: 14px;
+    color: #4B4B4B;
+    font-weight: 600;
+    margin: 0px;
+}
+.planning h2{
+    color: #000000;
+    font-size: 64px;
+    font-weight: 600;
+    margin: 0px;
+}
+.heading button{
+    color: #000000;
+    background-color: #ffffff;
+    padding: 8px 20px;
+    font-weight: 600;
+    border-radius: 20px;
+    border: 1px solid #C2C2C2;
+    font-size: 14px;
+    cursor: pointer;
+}
+.heading button:hover{
+    color: #ffffff;
+    background-color: #0057D9;
+    border: 0px;
+}
+.cards-content{
+    display: flex;
+    justify-content: space-between;
+    padding-top: 50px;
+   
+}
+
+
+.country img{
+    border-radius: 15px;
+    cursor: pointer;
+}
+.info{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.info h2,h3,h4{
+    margin: 0px;
+}
+.info h2{
+    font-weight: 800;
+}
+.info h3{
+    font-weight: 600;
+}
+.info h4{
+    color: #C2C2C2;
+}
+@media (max-width:1200px){
+    .cards-content{
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+    }
+    .country{
+        flex-grow: 1;
+    }
+}
+@media (max-width:800px){
+    .planning h2{
+        font-size: 40px;
+    }
+    .heading button{
+        padding: 4px 10px;
+        font-size: 8px;
+    }
+    .cards-wrapper{
+        padding: 30px;
+    }
+}
