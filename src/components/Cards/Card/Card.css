@@ -1,0 +1,8 @@
+.cards-wrapper{
+    padding: 45px 50px
+}
+@media (max-width:800px){
+    .cards-wrapper{
+        padding: 30px;
+    }
+}

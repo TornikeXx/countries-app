@@ -3,7 +3,7 @@ import logo from "../../assets/logo.svg"
 import search from "../../assets/search.svg"
 import save from "../../assets/save.svg"
 
-const Header = () => {
+const Header:React.FC = () => {
   return (
     <div className='header-wrapper'>
       <img src={logo} alt=""  />

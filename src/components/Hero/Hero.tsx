@@ -1,6 +1,6 @@
 import "./Hero.css"
 
-const Hero = () => {
+const Hero:React.FC = () => {
   return (
       <div className='hero-wrapper'>
           <div className="tittle">
