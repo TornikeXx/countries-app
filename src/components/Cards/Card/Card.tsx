@@ -1,9 +1,9 @@
 import { PropsWithChildren } from "react"
-import "./Card.css"
+import styles from "./Card.module.css"
 
 const Card:React.FC<PropsWithChildren> = ({children}) => {
   return (
-    <div className="cards-wrapper">
+    <div className={styles.cardsWrapper}>
       {children}
     </div>
   )

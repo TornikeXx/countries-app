@@ -1,4 +1,4 @@
-.cards-content{
+.cardsContent{
     display: flex;
     justify-content: space-between;
     padding-top: 50px;
@@ -26,7 +26,7 @@
     color: #C2C2C2;
 }
 @media (max-width:1200px){
-    .cards-content{
+    .cardsContent{
         flex-direction: column;
         align-items: center;
         gap: 30px;

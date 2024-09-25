@@ -1,9 +1,9 @@
-import "./Hero.css"
+import styles from "./Hero.module.css"
 
 const Hero:React.FC = () => {
   return (
-      <div className='hero-wrapper'>
-          <div className="tittle">
+      <div className={styles.heroWrapper}>
+          <div className={styles.tittle}>
              <h1>Discover story-worthy travel moments</h1> 
           </div>      
     </div>

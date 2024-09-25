@@ -1,10 +1,10 @@
-.header-wrapper{
+.headerWrapper{
     padding: 15px 50px;
     display: flex;
     justify-content: space-between;
     height: 30px;
 }
-.header-wrapper img{
+.headerWrapper img{
     cursor: pointer;
 }
 .navigation{
@@ -46,7 +46,7 @@
 }
 
 @media (max-width:850px){
-    .header-wrapper{
+    .headerWrapper{
         padding: 15px 30px;
     }
     .navigation{
