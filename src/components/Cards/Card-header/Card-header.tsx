@@ -1,4 +1,5 @@
-import styles from "./Card-header.module.css"
+import styles from "@/components/Cards/Card-header/Card-header.module.css"
+
 const CardHeader:React.FC = () => {
   return (
     <div className={styles.heading}>

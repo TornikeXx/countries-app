@@ -1,7 +1,7 @@
-import styles from "./Header.module.css"
-import logo from "../../assets/logo.svg"
-import search from "../../assets/search.svg"
-import save from "../../assets/save.svg"
+import styles from "@/components/Header/Header.module.css"
+import logo from "@/assets/logo.svg"
+import search from "@/assets/search.svg"
+import save from "@/assets/save.svg"
 
 const Header:React.FC = () => {
   return (
