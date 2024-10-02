@@ -5,13 +5,11 @@ import DestinationsPageView from './pages/destinations/views';
 import { lazy,Suspense } from 'react';
 import NotFoundPage from './pages/404';
 
-
-const App: React.FC = () => {
-
-  const LazyHomePageView = lazy(
+const LazyHomePageView = lazy(
     ()=> import("./pages/home/views")
-  )
-
+)
+  
+const App: React.FC = () => {
   return (
     <>
       <Routes>
