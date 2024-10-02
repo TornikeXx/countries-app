@@ -1,12 +1,16 @@
 import { Route, Routes } from 'react-router-dom';
 import Layout from './layouts/default';
-import HomePageView from './pages/home/views';
+// import HomePageView from './pages/home/views';
 import DestinationsPageView from './pages/destinations/views';
-import { Suspense } from 'react';
+import { lazy,Suspense } from 'react';
 import NotFoundPage from './pages/404';
 
 
 const App: React.FC = () => {
+
+  const LazyHomePageView = lazy(
+    ()=> import("./pages/home/views")
+  )
 
   return (
     <>
@@ -18,7 +22,7 @@ const App: React.FC = () => {
                 <div>Loading...</div>
               }
             >
-             <HomePageView/>
+             <LazyHomePageView/>
             </Suspense>
           } />
           <Route path='/destinations' element={<DestinationsPageView/>} />
