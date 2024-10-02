@@ -1,4 +1,4 @@
-import styles from "@/components/Hero/Hero.module.css"
+import styles from "./Hero.module.css"
 
  const Hero: React.FC<{ title: string }> = (props) => {
   const {title} = props

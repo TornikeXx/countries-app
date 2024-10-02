@@ -1,4 +1,4 @@
-import styles from "@/components/Cards/Card-content/Card-content.module.css"
+import styles from "./Card-content.module.css"
 
 interface Country {
   name: string;
