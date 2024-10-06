@@ -1,33 +1,36 @@
 import { Route, Routes } from 'react-router-dom';
 import Layout from './layouts/default';
-// import HomePageView from './pages/home/views';
 import DestinationsPageView from './pages/destinations/views';
-import { lazy,Suspense } from 'react';
+import { lazy, Suspense } from 'react';
 import NotFoundPage from './pages/404';
+import SingleArticleView from './pages/home/views/single';
+import ContactPageView from './pages/contact/views';
 
 const LazyHomePageView = lazy(
-    ()=> import("./pages/home/views")
+  () => import("./pages/home/views/list")
 )
-  
+
 const App: React.FC = () => {
   return (
     <>
       <Routes>
-        <Route element={<Layout/>}>
+        <Route element={<Layout />}>
           <Route path='/' element={
             <Suspense
               fallback={
                 <div>Loading...</div>
               }
             >
-             <LazyHomePageView/>
+              <LazyHomePageView />
             </Suspense>
           } />
-          <Route path='/destinations' element={<DestinationsPageView/>} />
+          <Route path='/:id' element={ <SingleArticleView/>} />
+          <Route path='/destinations' element={<DestinationsPageView />} />
+          <Route path='/contact' element={<ContactPageView/> } />
         </Route>
-        <Route path='*' element={<NotFoundPage/>} />
+        <Route path='*' element={<NotFoundPage />} />
       </Routes>
-      
+
     </>
   )
 }

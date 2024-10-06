@@ -1,0 +1,8 @@
+.pageWrapper p{
+    font-size: 18px;
+    font-weight: 500;
+    color: #1e1f24;
+}
+.pageWrapper{
+    max-width: 320px;
+}
