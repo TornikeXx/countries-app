@@ -24,7 +24,7 @@ const App: React.FC = () => {
               <LazyHomePageView />
             </Suspense>
           } />
-          <Route path='/:id' element={ <SingleArticleView/>} />
+          <Route path='/articles/:id' element={ <SingleArticleView/>} />
           <Route path='/destinations' element={<DestinationsPageView />} />
           <Route path='/contact' element={<ContactPageView/> } />
         </Route>

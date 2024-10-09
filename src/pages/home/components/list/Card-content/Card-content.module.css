@@ -1,7 +1,6 @@
 .cardsContent{
     display: flex;
     justify-content: space-between;
-    padding-top: 50px;
    
 }
 .country img{
@@ -25,6 +24,37 @@
 .info h4{
     color: #C2C2C2;
 }
+.sorting{
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin: 50px 0px 30px 0px;
+    gap: 5px;
+}
+.sorting button{
+    background-color: white;
+    border: 0px;
+    font-size: 16px;
+    font-weight: 600;
+}
+.sorting h3:nth-of-type(2){
+    color: #0057D9;
+    cursor: pointer;
+}
+.info button{
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+    background-color: #0057D9;
+    color: #ffffff;
+    cursor: pointer;
+}
+.info button:hover{
+    background-color: #0265f7;
+}
+
 @media (max-width:1200px){
     .cardsContent{
         flex-direction: column;

@@ -3,7 +3,6 @@ import Hero from '@/components/Hero/Hero'
 import Card from "@/pages/home/components/list/Card/Card"
 import CardHeader from "@/pages/home/components/list/Card-header/Card-header"
 import CardContent from "@/pages/home/components/list/Card-content/Card-content"
-import { countriesList } from '@/pages/home/static/data'
 
 
 // interface Country {
@@ -26,7 +25,7 @@ const HomePageView: React.FC = () => {
       <Hero title='Discover story-worthy travel moments' />
       <Card>
           <CardHeader />
-          <CardContent countries={countriesList}/>
+          <CardContent/>
       </Card>
       
     </>
