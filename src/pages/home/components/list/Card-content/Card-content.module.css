@@ -1,8 +1,40 @@
-.cardsContent{
+.cardsContent {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+
+    /* flex-direction: column; */
+    /* justify-content: space-between; */
+}
+/* .country{
+    flex:0 1 calc(50% - 20px)
+} */
+.country p{
+    color:green;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+}
+ .deleted p{
+    color: red;
+ }
+ .deleted img{
+    opacity: 20%;
+ }
+ .country{
+    /* width: 150px; */
+    /* display: flex; */
+    /* flex: 1 1 300px; */
+    flex: 1 1 calc(33.333% - 16px)
+ }
+ .additionalButtons{
     display: flex;
     justify-content: space-between;
-   
-}
+    /* max-width: 100px; */
+ }
+
+
 .country img{
     border-radius: 15px;
     cursor: pointer;
@@ -11,6 +43,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    width:360px;
 }
 .info h2,h3,h4{
     margin: 0px;
