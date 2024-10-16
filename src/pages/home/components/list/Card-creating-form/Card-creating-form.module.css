@@ -13,5 +13,7 @@
     /* flex:1 1;
     height: 40px; */
     height: 40px;
-    
+}
+.wrapper span{
+    color: red;
 }

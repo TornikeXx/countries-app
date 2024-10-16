@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import styles from "./Card-content.module.css"
-import { useReducer,FormEvent } from "react";
+import { useReducer } from "react";
 import CardForm from "../Card-creating-form/Card-creating-form";
 import { countriesReducer } from "../reducer/reducer";
 import { countryInitialState } from "../reducer/state";
@@ -29,16 +29,7 @@ const CardContent: React.FC = () => {
 
 
 
-  const handleCreateCountry = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const countryFields: any = {};
-    const formData = new FormData(e.currentTarget);
-
-    for (const [key, value] of formData) {
-      countryFields[key] = value;
-    }
-
+  const handleCreateCountry = (countryFields:{name:string,capital:string,population:string}) => {
     dispatch({ type: "create", payload: { countryFields } });
   };
 
