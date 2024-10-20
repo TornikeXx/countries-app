@@ -2,7 +2,8 @@ import styles from "./Header.module.css"
 import logo from "@/assets/logo.svg"
 import search from "@/assets/search.svg"
 import save from "@/assets/save.svg"
-import { NavLink,NavLinkRenderProps } from "react-router-dom"
+import { NavLink,NavLinkRenderProps, useNavigate, useParams } from "react-router-dom"
+import { useState } from "react"
 
 const Header: React.FC = () => {
   const handleActiveNav = (props: NavLinkRenderProps) => {
@@ -14,29 +15,44 @@ const Header: React.FC = () => {
       return styles["nav_item"];
     }
   };
+
+  const [language,setLanguage] = useState('ge')
+
+  const { lang } = useParams()
+  // console.log(lang)
+  const navigation = useNavigate()
+
+  const handleNavigation = () => {
+    const newLang = lang === "ge" ? "en" : "ge"
+    setLanguage(newLang)
+    navigation(`/${newLang}/articles`)
+  }
+
   return (
     <div className={styles.headerWrapper}>
       <div className={styles.nav}>
-        <NavLink to="/">
+        <NavLink to="articles">
           <img src={logo} alt="" />
         </NavLink>
-        <NavLink to="/destinations" className={handleActiveNav}>
-          Destinations 
+        <NavLink to="destinations" className={handleActiveNav}>
+          {lang==="en" ? "Destinations" : "მიმართულებები"}
+          
         </NavLink>
-        <NavLink to="/contact" className={handleActiveNav}>
-          Contact
+        <NavLink to="contact" className={handleActiveNav}>
+          {lang === "en" ? "Contact" :"კონტაქტი"}
         </NavLink>
       </div>
       <div className={styles.navigation}>
         <div className={styles.attributes}>
           <img src={search} alt="" />
-          <p>Search</p>
+          <p>{lang==="en" ? "Search" : "ძებნა"}</p>
         </div>
         <div className={styles.attributes}>
           <img src={save} alt="" />
-          <p>Saves</p>
+          <p>{lang==="en"? "Saves" : "შენახული" }</p>
         </div>
-        <button>Sign In</button>
+        <button>{lang==="en" ?"Sign in": "შესვლა" }</button>
+        <button onClick={handleNavigation} >{lang === 'ge' ? 'Eng' : 'ქარ'}</button>
       </div>
     </div>
   )

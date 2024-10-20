@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, } from 'react-router-dom';
 import Layout from './layouts/default';
 import DestinationsPageView from './pages/destinations/views';
 import { lazy, Suspense } from 'react';
@@ -10,12 +10,15 @@ const LazyHomePageView = lazy(
   () => import("./pages/home/views/list")
 )
 
+
 const App: React.FC = () => {
+
+
   return (
     <>
       <Routes>
-        <Route element={<Layout />}>
-          <Route path='/' element={
+        <Route path="/:lang" element={<Layout />}>
+          <Route path='articles' element={
             <Suspense
               fallback={
                 <div>Loading...</div>
@@ -24,10 +27,11 @@ const App: React.FC = () => {
               <LazyHomePageView />
             </Suspense>
           } />
-          <Route path='/articles/:id' element={ <SingleArticleView/>} />
-          <Route path='/destinations' element={<DestinationsPageView />} />
-          <Route path='/contact' element={<ContactPageView/> } />
+          <Route path='articles/:id' element={ <SingleArticleView/>} />
+          <Route path='destinations' element={<DestinationsPageView />} />
+          <Route path='contact' element={<ContactPageView />} />
         </Route>
+        <Route path='/' element={<Navigate to={`/en/articles` } />} />
         <Route path='*' element={<NotFoundPage />} />
       </Routes>
 
@@ -36,3 +40,6 @@ const App: React.FC = () => {
 }
 
 export default App
+
+
+

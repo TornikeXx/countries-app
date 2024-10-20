@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import styles from "./Card-content.module.css"
 import { useReducer } from "react";
 import CardForm from "../Card-creating-form/Card-creating-form";
@@ -39,7 +39,9 @@ const CardContent: React.FC = () => {
     } else {
         dispatch({ type: "delete", payload: { id } });
     }
-};
+  };
+  const { lang } = useParams()
+  console.log(lang)
 
 
 
@@ -55,7 +57,7 @@ const CardContent: React.FC = () => {
         <CardForm onCountryCreate={handleCreateCountry}/>
       {countriesList.map((country, index) => (
         <div key={index} className={`${styles.country} ${country.deleted ? styles.deleted : ''}`}>
-                     <Link style={{color:"black", textDecoration:'none'}} to={`/articles/${country.id}`}>
+                     <Link style={{color:"black", textDecoration:'none'}} to={`/en/articles/${country.id}`}>
                       <img src={country.image} alt="" />
                      </Link>
                       <div className={styles.info}>
