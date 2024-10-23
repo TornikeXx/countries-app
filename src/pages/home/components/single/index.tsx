@@ -5,7 +5,8 @@ import styles from "./style.module.css"
 
 const SingleArticle = () => {
     const { id } = useParams()
-
+    const { lang } = useParams()
+    const currentLang = (lang === "en" || lang === "ge") ? lang : "en";
     const countryInfo = countriesList.find((article) => article.id === id)
 
     const articleDoesNotExist = !countryInfo
@@ -17,10 +18,10 @@ const SingleArticle = () => {
       <div className={styles.pageWrapper}>
           <img src={countryInfo.background} alt="" />
           <div className={styles.info}>
-              <p>{countryInfo.name},</p>
-              <p>{countryInfo.capital }</p>
+              <p>{countryInfo.name[currentLang]},</p>
+              <p>{countryInfo.capital[currentLang] }</p>
           </div>
-          <p>{countryInfo.about}</p>
+          <p>{countryInfo.about[currentLang]}</p>
           <NavLink to="/">
               <button>Back to Home</button>
           </NavLink>

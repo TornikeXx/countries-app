@@ -38,6 +38,8 @@
 .country img{
     border-radius: 15px;
     cursor: pointer;
+    width: 360px;
+    height: 360px;
 }
 .info{
     display: flex;

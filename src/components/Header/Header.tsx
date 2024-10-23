@@ -2,7 +2,7 @@ import styles from "./Header.module.css"
 import logo from "@/assets/logo.svg"
 import search from "@/assets/search.svg"
 import save from "@/assets/save.svg"
-import { NavLink,NavLinkRenderProps, useNavigate, useParams } from "react-router-dom"
+import { NavLink,NavLinkRenderProps, useLocation, useNavigate, useParams } from "react-router-dom"
 import { useState } from "react"
 
 const Header: React.FC = () => {
@@ -19,13 +19,14 @@ const Header: React.FC = () => {
   const [language,setLanguage] = useState('ge')
 
   const { lang } = useParams()
+  const location = useLocation()
   // console.log(lang)
   const navigation = useNavigate()
 
   const handleNavigation = () => {
     const newLang = lang === "ge" ? "en" : "ge"
     setLanguage(newLang)
-    navigation(`/${newLang}/articles`)
+    navigation(`/${newLang}${location.pathname.slice(3)}`)
   }
 
   return (

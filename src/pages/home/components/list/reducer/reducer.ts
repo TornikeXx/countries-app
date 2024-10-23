@@ -41,11 +41,12 @@ export const countriesReducer = (
     if (action.type === "create") {
         const newCountry = {
             ...action.payload.countryFields,
-            image: "https://lp-cms-production.imgix.net/2020-12/LPT0717_078.jpg?fit=crop&w=360&ar=1%3A1&auto=format&q=75",
+            // image: "https://lp-cms-production.imgix.net/2020-12/LPT0717_078.jpg?fit=crop&w=360&ar=1%3A1&auto=format&q=75",
             vote: 0,
             id: (Number(countriesList.at(-1)?.id) + 1).toString(),
             deleted: false,
         };
+        // console.log(newCountry)
     
         return [...countriesList,newCountry];
     }

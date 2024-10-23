@@ -1,67 +1,90 @@
 import styles from "./Card-creating-form.module.css"
 import { ChangeEvent, FormEvent, useState } from "react";
 
+type Translation = Record<string, string>;
+
+
 type CountryCreateFormProps = {
-  onCountryCreate: (articleFields: { name: string, capital:string, population:string}) => void;
+  onCountryCreate: (articleFields: { name: Translation, capital:Translation, population:string,image:string|null}) => void;
 };
 const CardForm: React.FC<CountryCreateFormProps> = ({ onCountryCreate }) => {
 
-  const [name, setName] = useState("")
-  const [capital, setCapital] = useState("")
-  const [population, setPopulation] = useState("")
 
-  const[nameError,setNameError] = useState("")
-  const[capitalError,setCapitalError] = useState("")
-  const[populationError,setPopulationError] = useState("")
+  const [nameEn, setNameEn] = useState("");
+  const [nameGe, setNameGe] = useState("");
+  const [capitalEn, setCapitalEn] = useState("");
+  const [capitalGe, setCapitalGe] = useState("");
+  const [population, setPopulation] = useState("")
+  const [isEnglish, setIsEnglish] = useState(true)
+  const [image,setImage] =useState<string | null>(null)
+
   
-  const handleChangeName = (e:ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    if (name.length > 10) {
-      setNameError("max 10 characters")
-    } else {
-      setNameError("")
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
-    setName(value)
-  }
-  const handleChangeCapital = (e:ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    if (capital.length > 10) {
-      setCapitalError("max 10 characters")
-    } else {
-      setCapitalError("")
-    }
-    setCapital(value)
-  }
-  const handleChangePopulation = (e:ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    if (isNaN(Number(value))) {
-      setPopulationError("only numbers")
-    } else {
-      setPopulationError("")
-    }
-    setPopulation(value)
-  }
+  };
+
+  
+  const handleChangeNameEn = (e: ChangeEvent<HTMLInputElement>) => setNameEn(e.target.value);
+  const handleChangeNameGe = (e: ChangeEvent<HTMLInputElement>) => setNameGe(e.target.value);
+  const handleChangeCapitalEn = (e: ChangeEvent<HTMLInputElement>) => setCapitalEn(e.target.value);
+  const handleChangeCapitalGe = (e: ChangeEvent<HTMLInputElement>) => setCapitalGe(e.target.value);
+  const handleChangePopulation = (e: ChangeEvent<HTMLInputElement>) => setPopulation(e.target.value);
+
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    onCountryCreate({ name, capital, population })
-    setName("")
-    setCapital("")
+
+    onCountryCreate({
+      name:{en:nameEn, ge:nameGe},
+      capital:{en:capitalEn, ge:capitalGe},
+      population,
+      image:image||"https://lp-cms-production.imgix.net/2020-12/LPT0717_078.jpg?fit=crop&w=360&ar=1%3A1&auto=format&q=75"
+    })
+
+    setNameEn("")
+    setCapitalEn("")
+    setNameGe("")
+    setCapitalGe("")
     setPopulation("")
+    setImage(null)
   }
   return (
-    <form className={styles.wrapper}
+    <div className={styles.wrapper}>
+      <div className="div">
+        <button onClick={()=>setIsEnglish(true)} disabled={isEnglish}>English</button>
+        <button onClick={()=>setIsEnglish(false)} disabled={!isEnglish}>ქართული</button>
+      </div>
+      <form className={styles.formWrapper}
       onSubmit={handleSubmit}
       >
-      <input name="name" placeholder="name" value={name} onChange={handleChangeName} />
-      <span>{nameError}</span>
-      <input name="capital" placeholder="capital" value={capital} onChange={handleChangeCapital} />
-      <span>{capitalError }</span>
-      <input name="population" placeholder="populaton" value={population} onChange={handleChangePopulation} />
-      <span>{ populationError}</span>
-      <button type="submit">Add</button>
-  </form>
+        {isEnglish ? (
+          <>
+            <input name="nameEng" type="text" placeholder="name" value={nameEn} onChange={handleChangeNameEn} minLength={3} maxLength={40} />
+            <input name="capitalEng" placeholder="capital" value={capitalEn} onChange={handleChangeCapitalEn} minLength={3}/>
+          </>
+        ) : (
+          <>
+            <input name="nameGeo" type="text" placeholder="სახელი" value={nameGe} onChange={handleChangeNameGe} minLength={3} maxLength={40} />
+            <input name="capitalGeo" placeholder="დედაქალაქი" value={capitalGe} onChange={handleChangeCapitalGe}/>
+          </>
+        )}
+
+        <input name="population" placeholder="populaton" value={population} onChange={handleChangePopulation} />
+        <input type="file" accept=".png, .jpg" onChange={handleImageUpload} />
+        <button type="submit">Add</button>
+      </form>
+      </div>
   )
 }
 
 export default CardForm
+
+

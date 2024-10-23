@@ -1,4 +1,4 @@
-.wrapper{
+.formWrapper{
     width: 360px;
     height: 360px;
     display: flex;
@@ -9,11 +9,16 @@
     /* justify-content: center; */
     /* padding: 30px; */
 } 
-.wrapper *{
+.formWrapper *{
     /* flex:1 1;
     height: 40px; */
     height: 40px;
 }
-.wrapper span{
+.formWrapper span{
     color: red;
+}
+.wrapper{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }

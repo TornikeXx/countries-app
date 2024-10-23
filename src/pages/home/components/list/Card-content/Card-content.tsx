@@ -11,6 +11,9 @@ import { countryInitialState } from "../reducer/state";
 
 const CardContent: React.FC = () => {
 
+  type Translation = Record<string, string>;
+
+
   const [countriesList,dispatch] = useReducer(
     countriesReducer,
     countryInitialState
@@ -29,8 +32,9 @@ const CardContent: React.FC = () => {
 
 
 
-  const handleCreateCountry = (countryFields:{name:string,capital:string,population:string}) => {
+  const handleCreateCountry = (countryFields:{name:Translation,capital:Translation,population:string, image:string|null}) => {
     dispatch({ type: "create", payload: { countryFields } });
+    // console.log(countryFields)
   };
 
   const handleDeleteCountry = (id: string, isDeleted: boolean) => {
@@ -41,6 +45,7 @@ const CardContent: React.FC = () => {
     }
   };
   const { lang } = useParams()
+  const currentLang = lang || "en";
   console.log(lang)
 
 
@@ -57,12 +62,12 @@ const CardContent: React.FC = () => {
         <CardForm onCountryCreate={handleCreateCountry}/>
       {countriesList.map((country, index) => (
         <div key={index} className={`${styles.country} ${country.deleted ? styles.deleted : ''}`}>
-                     <Link style={{color:"black", textDecoration:'none'}} to={`/en/articles/${country.id}`}>
+                     <Link style={{color:"black", textDecoration:'none'}} to={`/${currentLang}/articles/${country.id}`}>
                       <img src={country.image} alt="" />
                      </Link>
                       <div className={styles.info}>
-                          <h2>{country.name}</h2>
-                          <h3>{country.capital}</h3>
+                          <h2>{country.name[currentLang]}</h2>
+                          <h3>{country.capital[currentLang]}</h3>
                           <h4>{country.population}</h4>
                           <div className={styles.additionalButtons}>
                               <button onClick={handleVote(country.id)}>Been Here:{country.vote}</button>
