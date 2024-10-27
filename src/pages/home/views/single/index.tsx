@@ -1,13 +1,11 @@
-import SingleArticle from "../../components/single"
+import SingleArticle from "../../components/single";
 
 const SingleArticleView = () => {
-   
-
-    return (
+  return (
     <>
-      <SingleArticle/>
+      <SingleArticle />
     </>
-  )
-}
+  );
+};
 
-export default SingleArticleView
+export default SingleArticleView;

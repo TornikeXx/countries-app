@@ -1,8 +1,7 @@
-.footerWrapper{
-    height: 80px;
-    background-color: #e0dede;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
+.footerWrapper {
+  height: 80px;
+  background-color: #e0dede;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

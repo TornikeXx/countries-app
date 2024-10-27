@@ -7,10 +7,10 @@ const Layout: React.FC = () => {
   return (
     <>
       <Header />
-        <Outlet/>
-      <Footer/>
+      <Outlet />
+      <Footer />
     </>
-  )
+  );
 };
 
 export default Layout;

@@ -1,8 +1,8 @@
-.cardsWrapper{
-    padding: 45px 50px
+.cardsWrapper {
+  padding: 45px 50px;
 }
-@media (max-width:800px){
-    .cardsWrapper{
-        padding: 30px;
-    }
+@media (max-width: 800px) {
+  .cardsWrapper {
+    padding: 30px;
+  }
 }
