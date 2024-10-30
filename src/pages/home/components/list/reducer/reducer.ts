@@ -21,8 +21,8 @@ type Translation = {
 type CountriesInitalState = Country[];
 
 export type CountryFields = {
-  name: Translation; 
-  capital: Translation; 
+  name: Translation;
+  capital: Translation;
   population: string;
   image: string | null;
 };
