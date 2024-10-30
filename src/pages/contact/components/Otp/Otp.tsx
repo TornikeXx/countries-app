@@ -22,6 +22,38 @@ const Otp: React.FC<OtpProps> = ({ length }) => {
     }
   };
 
+  const handlePaste = (
+    e: React.ClipboardEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData("Text").slice(0, length - index);
+    const newOtp = [...otp];
+
+    for (let i = 0; i < pastedData.length; i++) {
+      if (index + i < length) {
+        newOtp[index + i] = pastedData[i];
+      }
+    }
+
+    setOtp(newOtp);
+
+    newOtp.forEach((digit, i) => {
+      if (inputRefs.current[i]) {
+        inputRefs.current[i]!.value = digit;
+      }
+    });
+
+    const nextIndex = index + pastedData.length;
+    if (nextIndex < length) {
+      inputRefs.current[nextIndex]?.focus();
+    } else {
+      buttonRef.current?.focus();
+    }
+  };
+
+
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     index: number,
@@ -56,6 +88,7 @@ const Otp: React.FC<OtpProps> = ({ length }) => {
             maxLength={1}
             onChange={(e) => handleChange(e, index)}
             onKeyDown={(e) => handleKeyDown(e, index)}
+            onPaste={(e)=>handlePaste(e,index)}
           />
         ))}
       </div>
