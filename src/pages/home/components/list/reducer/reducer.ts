@@ -1,4 +1,5 @@
-interface Country {
+
+export interface Country {
   name: {
     ge: string;
     en: string;
@@ -12,95 +13,76 @@ interface Country {
   id: string;
   vote: number;
   deleted: boolean;
+  background: string;
+  about: {
+    ge: string;
+    en: string;
+  }
 }
-type Translation = {
-  ge: string;
-  en: string;
-};
-
-type CountriesInitalState = Country[];
 
 export type CountryFields = {
-  name: Translation;
-  capital: Translation;
+  name: { ge: string; en: string };
+  capital: { ge: string; en: string };
   population: string;
   image: string | null;
 };
 
+type CountriesInitalState = Country[];
+
 type CountrieReducerAction =
+  | { type: "initialize"; payload: { countries: Country[] } }
   | { type: "vote"; payload: { id: string } }
   | { type: "sort"; payload: { sortType: "asc" | "desc" } }
-  | { type: "create"; payload: { countryFields: CountryFields } }
+  | { type: "create"; payload: { countryFields: Country } }
   | { type: "delete"; payload: { id: string } }
-  | { type: "restore"; payload: { id: string } };
+  | { type: "restore"; payload: { id: string } }
+  | { type: "modify"; payload: { id: string; newPopulation: string } };
+
+
 
 export const countriesReducer = (
   countriesList: CountriesInitalState,
   action: CountrieReducerAction,
 ): CountriesInitalState => {
-  if (action.type === "vote") {
-    const uptadetCountryList = countriesList.map(
-      (country) =>
+  switch (action.type) {
+    case "initialize":
+      return action.payload.countries;
+
+    case "vote":
+      return countriesList.map(country =>
         country.id === action.payload.id
           ? { ...country, vote: country.vote + 1 }
-          : country,
-      // console.log(action.payload)
-    );
-    return uptadetCountryList;
-  }
+          : country
+      );
 
-  if (action.type === "sort") {
-    const sortedCountries = [...countriesList]
-      .filter((coutry) => !coutry.deleted)
-      .sort((a, b) => {
-        return action.payload.sortType === "asc"
-          ? a.vote - b.vote
-          : b.vote - a.vote;
-      })
-      .concat(countriesList.filter((country) => country.deleted));
-    return sortedCountries;
-  }
-
-  if (action.type === "create") {
-    const newCountry: Country = {
-      ...action.payload.countryFields,
-      vote: 0,
-      id: (Number(countriesList.at(-1)?.id) + 1).toString(),
-      deleted: false,
-    };
-    console.log(action.payload);
-    // console.log(newCountry)
-
-    return [...countriesList, newCountry];
-  }
-
-  if (action.type === "delete") {
-    const updatedCountriesList = countriesList.filter(
-      (country) => country.id !== action.payload.id,
-    );
-    const deletedCountry = countriesList.find(
-      (country) => country.id === action.payload.id,
-    );
-
-    if (deletedCountry) {
-      return [...updatedCountriesList, { ...deletedCountry, deleted: true }];
+    case "sort": {
+      const sortedCountries = [...countriesList]
+        .filter(country => !country.deleted)
+        .sort((a, b) =>
+          action.payload.sortType === "asc" ? a.vote - b.vote : b.vote - a.vote
+        )
+        .concat(countriesList.filter(country => country.deleted));
+      return sortedCountries;
     }
 
-    return updatedCountriesList;
-  }
+    case "create":
+      return [...countriesList, { ...action.payload.countryFields, deleted: false, vote: 0 }];
 
-  if (action.type === "restore") {
-    const restoredCountry = countriesList.find(
-      (country) => country.id === action.payload.id,
-    );
-    if (restoredCountry) {
-      return [
-        { ...restoredCountry, deleted: false },
-        ...countriesList.filter((country) => country.id !== action.payload.id),
-      ];
-    }
-    return countriesList;
-  }
+    case "delete":
+      return countriesList.filter((country) => country.id !== action.payload.id);
+    
 
-  return countriesList;
+    case "restore":
+      return countriesList.map(country =>
+        country.id === action.payload.id ? { ...country, deleted: false } : country
+      );
+      case "modify":
+        return countriesList.map((country) => 
+          country.id === action.payload.id ? { ...country, population: action.payload.newPopulation } : country
+        );
+    
+
+    default:
+      return countriesList;
+  }
 };
