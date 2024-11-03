@@ -46,6 +46,16 @@
   gap: 8px;
   width: 360px;
 }
+.imgInput {
+  margin-bottom: 20px;
+  /* cursor: pointer; */
+}
+.imgInput label {
+  cursor: pointer;
+  font-size: 14px;
+  color: #2c2b2c;
+  font-weight: 600;
+}
 .info h2,
 h3,
 h4 {

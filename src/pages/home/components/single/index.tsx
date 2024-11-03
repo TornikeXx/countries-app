@@ -1,4 +1,3 @@
-
 import { NavLink, useParams } from "react-router-dom";
 import styles from "./style.module.css";
 import { useEffect, useState } from "react";
@@ -11,7 +10,8 @@ const SingleArticle = () => {
   const currentLang = lang === "en" || lang === "ge" ? lang : "en";
 
   useEffect(() => {
-    axios.get<Country[]>("http://localhost:3000/countries")
+    axios
+      .get<Country[]>("http://localhost:3000/countries")
       .then((response) => {
         const country = response.data.find((country) => country.id === id);
         setCountryInfo(country);
@@ -33,7 +33,7 @@ const SingleArticle = () => {
         <p>{countryInfo.name[currentLang]},</p>
         <p>{countryInfo.capital[currentLang]}</p>
       </div>
-      <p>{countryInfo.about[currentLang]}</p> 
+      <p>{countryInfo.about[currentLang]}</p>
       <NavLink to="/">
         <button>Back to Home</button>
       </NavLink>
@@ -42,4 +42,3 @@ const SingleArticle = () => {
 };
 
 export default SingleArticle;
-

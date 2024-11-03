@@ -1,4 +1,3 @@
-
 export interface Country {
   name: {
     ge: string;
@@ -17,7 +16,7 @@ export interface Country {
   about: {
     ge: string;
     en: string;
-  }
+  };
 }
 
 export type CountryFields = {
@@ -36,9 +35,10 @@ type CountrieReducerAction =
   | { type: "create"; payload: { countryFields: Country } }
   | { type: "delete"; payload: { id: string } }
   | { type: "restore"; payload: { id: string } }
-  | { type: "modify"; payload: { id: string; newPopulation: string } };
-
-
+  | {
+      type: "modify";
+      payload: { id: string; newPopulation?: string; newImageUrl?: string };
+    };
 
 export const countriesReducer = (
   countriesList: CountriesInitalState,
@@ -49,38 +49,54 @@ export const countriesReducer = (
       return action.payload.countries;
 
     case "vote":
-      return countriesList.map(country =>
+      return countriesList.map((country) =>
         country.id === action.payload.id
           ? { ...country, vote: country.vote + 1 }
-          : country
+          : country,
       );
 
     case "sort": {
       const sortedCountries = [...countriesList]
-        .filter(country => !country.deleted)
+        .filter((country) => !country.deleted)
         .sort((a, b) =>
-          action.payload.sortType === "asc" ? a.vote - b.vote : b.vote - a.vote
+          action.payload.sortType === "asc" ? a.vote - b.vote : b.vote - a.vote,
         )
-        .concat(countriesList.filter(country => country.deleted));
+        .concat(countriesList.filter((country) => country.deleted));
       return sortedCountries;
     }
 
     case "create":
-      return [...countriesList, { ...action.payload.countryFields, deleted: false, vote: 0 }];
+      return [
+        ...countriesList,
+        { ...action.payload.countryFields, deleted: false, vote: 0 },
+      ];
 
     case "delete":
-      return countriesList.filter((country) => country.id !== action.payload.id);
-    
+      return countriesList.filter(
+        (country) => country.id !== action.payload.id,
+      );
 
     case "restore":
-      return countriesList.map(country =>
-        country.id === action.payload.id ? { ...country, deleted: false } : country
+      return countriesList.map((country) =>
+        country.id === action.payload.id
+          ? { ...country, deleted: false }
+          : country,
       );
-      case "modify":
-        return countriesList.map((country) => 
-          country.id === action.payload.id ? { ...country, population: action.payload.newPopulation } : country
-        );
-    
+
+    case "modify": {
+      const { id, newPopulation, newImageUrl } = action.payload;
+      return countriesList.map((country) => {
+        if (country.id === id) {
+          return {
+            ...country,
+            population:
+              newPopulation !== undefined ? newPopulation : country.population,
+            image: newImageUrl !== undefined ? newImageUrl : country.image,
+          };
+        }
+        return country;
+      });
+    }
 
     default:
       return countriesList;

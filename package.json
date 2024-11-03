@@ -12,8 +12,8 @@
     "format": "prettier . --write",
     "preview": "vite preview",
     "start": "vite",
-    "run-db":"npx json-server db.json",
-    "seed-db":"node Database.js",
+    "run-db": "npx json-server db.json",
+    "seed-db": "node Database.js",
     "prepare": "husky"
   },
   "dependencies": {
