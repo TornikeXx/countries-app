@@ -1,92 +1,102 @@
-
-
 import { Link, useParams } from "react-router-dom";
 import styles from "./Card-content.module.css";
-import { useEffect, useReducer, useState } from "react";
 import CardForm from "../Card-creating-form/Card-creating-form";
-import { countriesReducer, CountryFields } from "../reducer/reducer";
-import axios from "axios";
+import { CountryFields } from "../reducer/reducer";
+import {
+  changeCountryPopulation,
+  createCountry,
+  deleteCountry,
+  getCountries,
+  updateCountryImage,
+  updateVotesForCountries,
+} from "@/api/countries";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const CardContent: React.FC = () => {
-  const [countriesList, dispatch] = useReducer(countriesReducer, []);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:3000/countries")
-      .then((res) => {
-        dispatch({ type: "initialize", payload: { countries: res.data } });
-      })
-      .catch((e) => {
-        console.log(e);
-      })
-      .finally(() => setIsLoading(false));
-  }, []);
+  const queryClient = useQueryClient();
 
   type Language = "ge" | "en";
+
   const { lang } = useParams<{ lang: string }>();
   const currentLang: Language = (lang as Language) || "en";
 
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ["country-list"],
+    queryFn: getCountries,
+  });
+
+  const { mutate: voteMutation } = useMutation({
+    mutationFn: updateVotesForCountries,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["country-list"] });
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+
+  const { mutate: createCountryMutation } = useMutation({
+    mutationFn: (countryFields: CountryFields) => createCountry(countryFields),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["country-list"] });
+      refetch();
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+
+  const { mutate: deleteCountryMutation } = useMutation({
+    mutationFn: deleteCountry,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["coutry-key"] });
+      refetch();
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  const { mutate: updatePopulationMutation } = useMutation({
+    mutationFn: changeCountryPopulation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["country-key"] });
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+
+  const { mutate: updateImageMutation } = useMutation({
+    mutationFn: updateCountryImage,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["country-key"] });
+      refetch();
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+
   const handleVote = (id: string) => {
-    const country = countriesList.find((c) => c.id === id);
+    const country = data?.find((c) => c.id === id);
     if (country) {
-      axios
-        .patch(`http://localhost:3000/countries/${id}`, {
-          vote: country.vote + 1,
-        })
-        .then(() => {
-          dispatch({ type: "vote", payload: { id } });
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+      voteMutation({ id, vote: country.vote + 1 });
     }
   };
 
-  const sortCountries = (sortType: "asc" | "desc"): void => {
-    dispatch({ type: "sort", payload: { sortType } });
-  };
-
   const handleCreateCountry = (countryFields: CountryFields) => {
-    axios
-      .post("http://localhost:3000/countries", {
-        ...countryFields,
-        vote: 0,
-        deleted: false,
-      })
-      .then((res) => {
-        dispatch({ type: "create", payload: { countryFields: res.data } });
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+    createCountryMutation(countryFields);
   };
 
   const handleDeleteCountry = (id: string) => {
-    axios
-      .delete(`http://localhost:3000/countries/${id}`)
-      .then(() => {
-        dispatch({ type: "delete", payload: { id } });
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+    deleteCountryMutation(id);
   };
 
   const handleSavePopulation = (id: string, newPopulation: string) => {
-    const countryToUpdate = countriesList.find((country) => country.id === id);
-
+    const countryToUpdate = data?.find((country) => country.id === id);
     if (countryToUpdate) {
-      const updatedCountry = { ...countryToUpdate, population: newPopulation };
-
-      axios
-        .put(`http://localhost:3000/countries/${id}`, updatedCountry)
-        .then(() => {
-          dispatch({ type: "modify", payload: { id, newPopulation } });
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+      updatePopulationMutation({ id, newPopulation });
     }
   };
 
@@ -99,34 +109,26 @@ const CardContent: React.FC = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         const newImageUrl = reader.result as string;
-        axios
-          .patch(`http://localhost:3000/countries/${id}`, {
-            image: newImageUrl,
-          })
-          .then(() => {
-            dispatch({ type: "modify", payload: { id, newImageUrl } });
-          })
-          .catch((e) => {
-            console.log(e);
-          });
+        updateImageMutation({ id, imageUrl: newImageUrl });
       };
-      reader.readAsDataURL(file); 
+      reader.readAsDataURL(file);
     }
   };
 
   return (
     <>
       <div className={styles.sorting}>
-        <button onClick={() => sortCountries("asc")}>asc</button>
-        <button onClick={() => sortCountries("desc")}>desc</button>
+        {/* <button onClick={() => sortCountries("asc")}>asc</button>
+        <button onClick={() => sortCountries("desc")}>desc</button> */}
       </div>
 
       <div className={styles.cardsContent}>
         <CardForm onCountryCreate={handleCreateCountry} />
+        {isError ? "error" : null}
         {isLoading ? (
           <p>Loading...</p>
         ) : (
-          countriesList.map((country) => (
+          data?.map((country) => (
             <div
               key={country.id}
               className={`${styles.country} ${country.deleted ? styles.deleted : ""}`}
