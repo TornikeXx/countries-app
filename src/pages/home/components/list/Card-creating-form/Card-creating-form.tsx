@@ -11,6 +11,8 @@ type CountryCreateFormProps = {
     capital: Translation;
     population: string;
     image: string | null;
+    background: string;
+    about: Translation;
   }) => void;
 };
 const CardForm: React.FC<CountryCreateFormProps> = ({ onCountryCreate }) => {
@@ -54,6 +56,12 @@ const CardForm: React.FC<CountryCreateFormProps> = ({ onCountryCreate }) => {
       image:
         image ||
         "https://lp-cms-production.imgix.net/2020-12/LPT0717_078.jpg?fit=crop&w=360&ar=1%3A1&auto=format&q=75",
+      background:
+        "https://lp-cms-production.imgix.net/2021-10/Chapultepec%20Castle%2C%20Mexico%20City%2C%20Mexico%20Dowraik%20shutterstock_1609490656%20rfe.jpg?w=1920&h=640&fit=crop&crop=faces%2Cedges&auto=format&q=75",
+      about: {
+        en: `detailed information about ${nameEn}`,
+        ge: `დეტალური ინფორმაცია ${nameGe}-ს შესახებ`,
+      },
     });
 
     setNameEn("");

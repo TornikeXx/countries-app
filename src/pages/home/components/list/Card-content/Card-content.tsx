@@ -1,85 +1,65 @@
-import { Link, useParams } from "react-router-dom";
+
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import styles from "./Card-content.module.css";
 import CardForm from "../Card-creating-form/Card-creating-form";
-import { CountryFields } from "../reducer/reducer";
-import {
-  changeCountryPopulation,
-  createCountry,
-  deleteCountry,
-  getCountries,
-  updateCountryImage,
-  updateVotesForCountries,
-} from "@/api/countries";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {  CountryFields } from "../reducer/reducer";
+import { getCountries } from "@/api/countries";
+import { useInfiniteQuery} from "@tanstack/react-query";
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { useCountryMutations } from "../hooks/useCountryMutations";
+import React from "react";
 
 const CardContent: React.FC = () => {
-  const queryClient = useQueryClient();
-
   type Language = "ge" | "en";
-
   const { lang } = useParams<{ lang: string }>();
   const currentLang: Language = (lang as Language) || "en";
+  const parentRef = React.useRef<HTMLDivElement | null>(null);
 
-  const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["country-list"],
-    queryFn: getCountries,
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const sort = searchParams.get("sort") || "vote";
+
+  const { data, refetch, fetchNextPage, hasNextPage, isLoading, isError } = useInfiniteQuery({
+    queryKey: ["country-list", sort],
+    queryFn: ({ pageParam = 1 }) => getCountries({ sort, page: pageParam, limit: 15 }),
+
+    getNextPageParam: (lastPage, allPages) => {
+
+    return lastPage.length ? allPages.length + 1 : undefined;
+
+           },
+    
+    initialPageParam: 1,
+    gcTime: 1000 * 60,
+    staleTime: 1000 * 60,
+  });
+  
+  
+
+  const Country=data?.pages.flat() ?? []
+
+  const virtualizer = useVirtualizer({
+    count: data?.pages.flat().length || 0,
+
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 700,
   });
 
-  const { mutate: voteMutation } = useMutation({
-    mutationFn: updateVotesForCountries,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["country-list"] });
-    },
-    onError: (error) => {
-      console.error(error);
-    },
-  });
 
-  const { mutate: createCountryMutation } = useMutation({
-    mutationFn: (countryFields: CountryFields) => createCountry(countryFields),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["country-list"] });
-      refetch();
-    },
-    onError: (error) => {
-      console.error(error);
-    },
-  });
+  
 
-  const { mutate: deleteCountryMutation } = useMutation({
-    mutationFn: deleteCountry,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["coutry-key"] });
-      refetch();
-    },
-    onError: (error) => {
-      console.log(error);
-    },
-  });
+  const virtualItems = virtualizer.getVirtualItems();
 
-  const { mutate: updatePopulationMutation } = useMutation({
-    mutationFn: changeCountryPopulation,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["country-key"] });
-    },
-    onError: (error) => {
-      console.error(error);
-    },
-  });
-
-  const { mutate: updateImageMutation } = useMutation({
-    mutationFn: updateCountryImage,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["country-key"] });
-      refetch();
-    },
-    onError: (error) => {
-      console.error(error);
-    },
-  });
+  const {
+    voteMutation,
+    createCountryMutation,
+    deleteCountryMutation,
+    updatePopulationMutation,
+    updateImageMutation,
+  } = useCountryMutations(refetch);
 
   const handleVote = (id: string) => {
-    const country = data?.find((c) => c.id === id);
+    const country = Country?.find((c) => c.id === id);
     if (country) {
       voteMutation({ id, vote: country.vote + 1 });
     }
@@ -94,16 +74,13 @@ const CardContent: React.FC = () => {
   };
 
   const handleSavePopulation = (id: string, newPopulation: string) => {
-    const countryToUpdate = data?.find((country) => country.id === id);
+    const countryToUpdate = Country?.find((country) => country.id === id);
     if (countryToUpdate) {
       updatePopulationMutation({ id, newPopulation });
     }
   };
 
-  const handleImageUpload = (
-    id: string,
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleImageUpload = (id: string, event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -115,79 +92,107 @@ const CardContent: React.FC = () => {
     }
   };
 
+  const handleToggleSortOrder = () => {
+    const newSort = sort === "vote" ? "-vote" : "vote";
+    setSearchParams({ sort: newSort });
+  };
+  console.log(hasNextPage)
+
+
   return (
     <>
       <div className={styles.sorting}>
-        {/* <button onClick={() => sortCountries("asc")}>asc</button>
-        <button onClick={() => sortCountries("desc")}>desc</button> */}
+        <button onClick={handleToggleSortOrder}>
+          {sort === "vote" ? "Asc" : "Desc"}
+        </button>
       </div>
 
-      <div className={styles.cardsContent}>
-        <CardForm onCountryCreate={handleCreateCountry} />
-        {isError ? "error" : null}
+      <div
+        className={styles.cardsContent}
+        ref={parentRef}
+        style={{ overflowY: "auto", height: "100vh",display:"grid" }}
+      >
+        <div style={{marginRight:"",left:0}}>
+         <CardForm onCountryCreate={handleCreateCountry}  /> 
+        </div>
+        
+        {isError ? "Error loading data" : null}
         {isLoading ? (
           <p>Loading...</p>
         ) : (
-          data?.map((country) => (
-            <div
-              key={country.id}
-              className={`${styles.country} ${country.deleted ? styles.deleted : ""}`}
-            >
-              <Link
-                style={{ color: "black", textDecoration: "none" }}
-                to={`/${currentLang}/articles/${country.id}`}
-              >
-                <img
-                  src={
-                    country.image ||
-                    "https://lp-cms-production.imgix.net/2022-12/iStock-182059497-RFC.jpg?fit=crop&w=360&ar=1%3A1&auto=format&q=75"
-                  }
-                  alt={country.name[currentLang]}
-                />
-              </Link>
-
-              <div className={styles.imgInput}>
-                <input
-                  type="file"
-                  id={country.id}
-                  accept="image/*"
-                  style={{ display: "none" }}
-                  onChange={(e) => handleImageUpload(country.id, e)}
-                  placeholder="change image"
-                />
-                <label htmlFor={country.id}>change image</label>
-              </div>
-
-              <div className={styles.info}>
-                <h2>{country.name[currentLang]}</h2>
-                <h3>{country.capital[currentLang]}</h3>
-                <h4>{country.population}</h4>
-                <div style={{ display: "flex" }}>
-                  <input
-                    type="text"
-                    placeholder="Change population"
-                    onBlur={(e) =>
-                      handleSavePopulation(country.id, e.target.value)
-                    }
-                  />
-                  <button
-                    onClick={() =>
-                      handleSavePopulation(country.id, country.population)
-                    }
+          <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
+              {virtualItems.map((virtualItem) => {
+              const country = Country[virtualItem?.index];
+              
+              return (
+                <div
+                  key={country.id}
+                  className={`${styles.country} ${country.deleted ? styles.deleted : ""}`}
+                  style={{
+                    position: "absolute",
+                    top: virtualItem.start,
+                  }}
+                >
+                  <Link
+                    style={{ color: "black", textDecoration: "none" }}
+                    to={`/${currentLang}/articles/${country.id}`}
                   >
-                    Save
-                  </button>
-                </div>
+                    <img
+                      src={
+                        country.image ||
+                        "https://lp-cms-production.imgix.net/2022-12/iStock-182059497-RFC.jpg?fit=crop&w=360&ar=1%3A1&auto=format&q=75"
+                      }
+                      alt={country.name[currentLang]}
+                    />
+                  </Link>
 
-                <div className={styles.additionalButtons}>
-                  <button onClick={() => handleVote(country.id)}>
-                    Been Here: {country.vote}
-                  </button>
-                  <p onClick={() => handleDeleteCountry(country.id)}>Delete</p>
+                  <div className={styles.imgInput}>
+                    <input
+                      type="file"
+                      id={country.id}
+                      accept="image/*"
+                      style={{ display: "none" }}
+                      onChange={(e) => handleImageUpload(country.id, e)}
+                      placeholder="change image"
+                    />
+                    <label htmlFor={country.id}>Change image</label>
+                  </div>
+
+                  <div className={styles.info}>
+                    <h2>{country.name[currentLang]}</h2>
+                    <h3>{country.capital[currentLang]}</h3>
+                    <h4>{country.population}</h4>
+                    <div style={{ display: "flex" }}>
+                      <input
+                        type="text"
+                        placeholder="Change population"
+                        onBlur={(e) => handleSavePopulation(country.id, e.target.value)}
+                      />
+                      <button onClick={() => handleSavePopulation(country.id, country.population)}>
+                        Save
+                      </button>
+                    </div>
+
+                    <div className={styles.additionalButtons}>
+                      <button onClick={() => handleVote(country.id)}>
+                        Been Here: {country.vote}
+                      </button>
+                      <p onClick={() => handleDeleteCountry(country.id)}>Delete</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          ))
+                
+              );
+                
+              })}
+          </div>
+        )}
+        {hasNextPage && !isLoading && (
+          
+            <button onClick={() => fetchNextPage()} disabled={isLoading}>
+              Load more
+            </button>
+        
         )}
       </div>
     </>
