@@ -1,11 +1,10 @@
-
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import styles from "./Card-content.module.css";
 import CardForm from "../Card-creating-form/Card-creating-form";
-import {  CountryFields } from "../reducer/reducer";
+import { CountryFields } from "../reducer/reducer";
 import { getCountries } from "@/api/countries";
-import { useInfiniteQuery} from "@tanstack/react-query";
-import { useVirtualizer } from '@tanstack/react-virtual';
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { useCountryMutations } from "../hooks/useCountryMutations";
 import React from "react";
 
@@ -15,40 +14,59 @@ const CardContent: React.FC = () => {
   const currentLang: Language = (lang as Language) || "en";
   const parentRef = React.useRef<HTMLDivElement | null>(null);
 
-
   const [searchParams, setSearchParams] = useSearchParams();
   const sort = searchParams.get("sort") || "vote";
 
-  const { data, refetch, fetchNextPage, hasNextPage, isLoading, isError } = useInfiniteQuery({
-    queryKey: ["country-list", sort],
-    queryFn: ({ pageParam = 1 }) => getCountries({ sort, page: pageParam, limit: 15 }),
+  const { data, refetch, fetchNextPage, hasNextPage, isLoading, isError,isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ["country-list", sort],
+      queryFn: ({ pageParam = 1 }) =>
+        getCountries({ sort, page: pageParam, limit: 10 }),
 
-    getNextPageParam: (lastPage, allPages) => {
+      getNextPageParam: (lastPage, allPages) => {
+        return lastPage.length ? allPages.length + 1 : undefined;
+      },
 
-    return lastPage.length ? allPages.length + 1 : undefined;
+      initialPageParam: 1,
+      gcTime: 1000 * 60,
+      staleTime: 1000 * 60,
+    });
 
-           },
-    
-    initialPageParam: 1,
-    gcTime: 1000 * 60,
-    staleTime: 1000 * 60,
-  });
-  
-  
 
-  const Country=data?.pages.flat() ?? []
+
+  const Country = data ? data?.pages.flatMap((d) => d.data) : [];
 
   const virtualizer = useVirtualizer({
-    count: data?.pages.flat().length || 0,
-
+    count: hasNextPage ? Country.length + 1 : Country.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 700,
+    estimateSize: () => 600,
+    overscan: 5,
   });
 
-
-  
-
   const virtualItems = virtualizer.getVirtualItems();
+
+  React.useEffect(() => {
+    const [lastItem] = [...virtualItems].reverse();
+
+    if (!lastItem) {
+      return;
+    }
+
+    if (
+      lastItem.index >= Country.length - 1 &&
+      hasNextPage &&
+      !isFetchingNextPage
+    ) {
+      fetchNextPage();
+    }
+  }, [
+    hasNextPage,
+    fetchNextPage,
+    Country.length,
+    isFetchingNextPage,
+    virtualItems,
+  ]);
+  
 
   const {
     voteMutation,
@@ -80,7 +98,10 @@ const CardContent: React.FC = () => {
     }
   };
 
-  const handleImageUpload = (id: string, event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (
+    id: string,
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -96,8 +117,7 @@ const CardContent: React.FC = () => {
     const newSort = sort === "vote" ? "-vote" : "vote";
     setSearchParams({ sort: newSort });
   };
-  console.log(hasNextPage)
-
+  console.log(hasNextPage);
 
   return (
     <>
@@ -110,20 +130,22 @@ const CardContent: React.FC = () => {
       <div
         className={styles.cardsContent}
         ref={parentRef}
-        style={{ overflowY: "auto", height: "100vh",display:"grid" }}
+        style={{ overflowY: "auto", height: "100vh", display: "grid" }}
       >
-        <div style={{marginRight:"",left:0}}>
-         <CardForm onCountryCreate={handleCreateCountry}  /> 
+        <div style={{ marginRight: "", left: 0 }}>
+          <CardForm onCountryCreate={handleCreateCountry} />
         </div>
-        
+
         {isError ? "Error loading data" : null}
         {isLoading ? (
           <p>Loading...</p>
         ) : (
-          <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
-              {virtualItems.map((virtualItem) => {
+          <div
+            style={{ height: virtualizer.getTotalSize(), position: "relative" }}
+          >
+            {virtualItems.map((virtualItem) => {
               const country = Country[virtualItem?.index];
-              
+
               return (
                 <div
                   key={country.id}
@@ -166,9 +188,15 @@ const CardContent: React.FC = () => {
                       <input
                         type="text"
                         placeholder="Change population"
-                        onBlur={(e) => handleSavePopulation(country.id, e.target.value)}
+                        onBlur={(e) =>
+                          handleSavePopulation(country.id, e.target.value)
+                        }
                       />
-                      <button onClick={() => handleSavePopulation(country.id, country.population)}>
+                      <button
+                        onClick={() =>
+                          handleSavePopulation(country.id, country.population)
+                        }
+                      >
                         Save
                       </button>
                     </div>
@@ -177,23 +205,23 @@ const CardContent: React.FC = () => {
                       <button onClick={() => handleVote(country.id)}>
                         Been Here: {country.vote}
                       </button>
-                      <p onClick={() => handleDeleteCountry(country.id)}>Delete</p>
+                      <p onClick={() => handleDeleteCountry(country.id)}>
+                        Delete
+                      </p>
                     </div>
                   </div>
                 </div>
-                
               );
-                
-              })}
+            })}
           </div>
         )}
         {hasNextPage && !isLoading && (
-          
-            <button onClick={() => fetchNextPage()} disabled={isLoading}>
-              Load more
-            </button>
-        
+          <button onClick={() => fetchNextPage()} disabled={isLoading}>
+            Load more
+          </button>
         )}
+                {/* {isFetching && !isFetchingNextPage ? 'Background Updating...' : null} */}
+
       </div>
     </>
   );
