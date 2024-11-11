@@ -14,10 +14,11 @@ export const getCountries = async ({
   limit: number;
 }) => {
   try {
-    const res = await httpClient.get(`/countries?_sort=${sort}&_page=${page}&_per_page=${limit}`);
+    const res = await httpClient.get(
+      `/countries?_sort=${sort}&_page=${page}&_per_page=${limit}`,
+    );
     // console.log(res.data.data)
     return res.data;
-    
   } catch (error) {
     throw new Error(`Error: ${error}`);
   }

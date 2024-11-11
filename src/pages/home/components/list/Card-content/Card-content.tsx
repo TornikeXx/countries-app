@@ -17,29 +17,34 @@ const CardContent: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const sort = searchParams.get("sort") || "vote";
 
-  const { data, refetch, fetchNextPage, hasNextPage, isLoading, isError,isFetchingNextPage } =
-    useInfiniteQuery({
-      queryKey: ["country-list", sort],
-      queryFn: ({ pageParam = 1 }) =>
-        getCountries({ sort, page: pageParam, limit: 10 }),
+  const {
+    data,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isLoading,
+    isError,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["country-list", sort],
+    queryFn: ({ pageParam }) =>
+      getCountries({ sort, page: pageParam, limit: 10 }),
 
-      getNextPageParam: (lastPage, allPages) => {
-        return lastPage.length ? allPages.length + 1 : undefined;
-      },
+    getNextPageParam: (lastPage) => {
+      return lastPage.next;
+    },
 
-      initialPageParam: 1,
-      gcTime: 1000 * 60,
-      staleTime: 1000 * 60,
-    });
-
-
+    initialPageParam: 1,
+    gcTime: 1000 * 60,
+    staleTime: 1000 * 60,
+  });
 
   const Country = data ? data?.pages.flatMap((d) => d.data) : [];
 
   const virtualizer = useVirtualizer({
     count: hasNextPage ? Country.length + 1 : Country.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 600,
+    estimateSize: () => 700,
     overscan: 5,
   });
 
@@ -66,7 +71,6 @@ const CardContent: React.FC = () => {
     isFetchingNextPage,
     virtualItems,
   ]);
-  
 
   const {
     voteMutation,
@@ -75,6 +79,7 @@ const CardContent: React.FC = () => {
     updatePopulationMutation,
     updateImageMutation,
   } = useCountryMutations(refetch);
+  console.log(hasNextPage)
 
   const handleVote = (id: string) => {
     const country = Country?.find((c) => c.id === id);
@@ -220,8 +225,7 @@ const CardContent: React.FC = () => {
             Load more
           </button>
         )}
-                {/* {isFetching && !isFetchingNextPage ? 'Background Updating...' : null} */}
-
+        {/* {isFetching && !isFetchingNextPage ? 'Background Updating...' : null} */}
       </div>
     </>
   );
