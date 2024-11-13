@@ -79,7 +79,7 @@ const CardContent: React.FC = () => {
     updatePopulationMutation,
     updateImageMutation,
   } = useCountryMutations(refetch);
-  console.log(hasNextPage)
+  console.log(hasNextPage);
 
   const handleVote = (id: string) => {
     const country = Country?.find((c) => c.id === id);
